@@ -1,10 +1,9 @@
-import { post } from './request'
-import { User, UserRole } from '@shared/types'
+import { post, get } from './request'
+import { User } from '@shared/types'
 
 export interface LoginRequest {
   username: string
   password: string
-  role: UserRole
 }
 
 export interface LoginResponse {
@@ -21,5 +20,5 @@ export const logout = (): Promise<void> => {
 }
 
 export const getCurrentUser = (): Promise<User> => {
-  return post<User>('/auth/me')
+  return get<User>('/auth/me')
 }

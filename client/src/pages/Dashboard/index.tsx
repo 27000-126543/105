@@ -46,6 +46,7 @@ const Dashboard: React.FC = () => {
     advertisers,
     channels,
     loading,
+    weekOverWeek,
     setFilters,
     setSelectedMediaId,
     setHeatmapMetric,
@@ -57,7 +58,8 @@ const Dashboard: React.FC = () => {
     setAudienceProfile,
     setAdvertisers,
     setChannels,
-    setLoading
+    setLoading,
+    setWeekOverWeek
   } = useDashboardStore()
 
   const [drawerVisible, setDrawerVisible] = useState(false)
@@ -96,7 +98,8 @@ const Dashboard: React.FC = () => {
         getChannelRanking(filters)
       ])
 
-      setSummary(summaryRes)
+      setSummary(summaryRes.summary)
+      setWeekOverWeek(summaryRes.weekOverWeek)
 
       const prevFilters = {
         ...filters,
@@ -104,7 +107,7 @@ const Dashboard: React.FC = () => {
         endDate: dayjs(filters.endDate).subtract(7, 'day').format('YYYY-MM-DD')
       }
       const prevSummaryRes = await getSummary(prevFilters)
-      setPreviousSummary(prevSummaryRes)
+      setPreviousSummary(prevSummaryRes.summary)
 
       setHeatmapData(heatmapRes)
       setChannelRanking(rankingRes)
@@ -193,54 +196,54 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  const metricCards = summary && previousSummary ? [
+  const metricCards = summary && weekOverWeek ? [
     {
       title: '总展示',
       value: summary.totalImpressions,
       valueType: 'number' as const,
-      change: (summary.totalImpressions - previousSummary.totalImpressions) / previousSummary.totalImpressions,
+      change: weekOverWeek.impressionsChange,
       icon: <EyeOutlined />
     },
     {
       title: '总点击',
       value: summary.totalClicks,
       valueType: 'number' as const,
-      change: (summary.totalClicks - previousSummary.totalClicks) / previousSummary.totalClicks,
+      change: weekOverWeek.clicksChange,
       icon: <ArrowUpOutlined />
     },
     {
       title: '总转化',
       value: summary.totalConversions,
       valueType: 'number' as const,
-      change: (summary.totalConversions - previousSummary.totalConversions) / previousSummary.totalConversions,
+      change: weekOverWeek.conversionsChange,
       icon: <ShoppingCartOutlined />
     },
     {
       title: '总花费',
       value: summary.totalCost,
       valueType: 'currency' as const,
-      change: (summary.totalCost - previousSummary.totalCost) / previousSummary.totalCost,
+      change: weekOverWeek.costChange,
       icon: <MoneyCollectOutlined />
     },
     {
       title: '平均CTR',
       value: summary.avgCtr,
       valueType: 'percent' as const,
-      change: (summary.avgCtr - previousSummary.avgCtr) / previousSummary.avgCtr,
+      change: weekOverWeek.ctrChange,
       icon: <PercentageOutlined />
     },
     {
       title: '平均CVR',
       value: summary.avgCvr,
       valueType: 'percent' as const,
-      change: (summary.avgCvr - previousSummary.avgCvr) / previousSummary.avgCvr,
+      change: weekOverWeek.cvrChange,
       icon: <PercentageOutlined />
     },
     {
       title: '平均ROI',
       value: summary.avgRoi,
       valueType: 'number' as const,
-      change: (summary.avgRoi - previousSummary.avgRoi) / previousSummary.avgRoi,
+      change: weekOverWeek.roiChange,
       icon: <RiseOutlined />
     }
   ] : []

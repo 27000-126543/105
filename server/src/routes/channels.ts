@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { getDb } from '../models/database';
 import { authenticateToken, requireRole } from '../middleware/auth';
+import { getAccessibleChannelIds } from '../middleware/permission';
 import { UserRole, Channel, AdPosition, ChannelType } from '@shared/types';
 
 const router = Router();
@@ -43,8 +44,15 @@ router.get('/', authenticateToken, (req: Request, res: Response) => {
     const db = getDb();
     const { type, enabled } = req.query;
 
+    const accessibleChannelIds = getAccessibleChannelIds(req.user!);
+    
     let sql = 'SELECT * FROM channels WHERE 1=1';
     const params: any[] = [];
+
+    if (accessibleChannelIds) {
+      sql += ` AND id IN (${accessibleChannelIds.map(() => '?').join(', ')})`;
+      params.push(...accessibleChannelIds);
+    }
 
     if (type) {
       sql += ' AND type = ?';

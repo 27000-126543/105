@@ -1,6 +1,16 @@
 import { create } from 'zustand'
 import { MetricsSummary, HeatmapData, TrendDataPoint, AudienceProfile, Channel, Advertiser } from '@shared/types'
 
+interface WeekOverWeek {
+  impressionsChange: number
+  clicksChange: number
+  conversionsChange: number
+  costChange: number
+  ctrChange: number
+  cvrChange: number
+  roiChange: number
+}
+
 interface DashboardState {
   filters: {
     advertiserId: string | undefined
@@ -11,10 +21,11 @@ interface DashboardState {
   selectedMediaId: string | null
   summary: MetricsSummary | null
   previousSummary: MetricsSummary | null
+  weekOverWeek: WeekOverWeek | null
   heatmapData: HeatmapData[]
   heatmapMetric: 'roi' | 'impressions' | 'conversions'
   channelRanking: Array<{ channelId: string; channelName: string; roi: number; impressions: number }>
-  positionTrend: TrendDataPoint[]
+  positionTrend: TrendDataPoint[] | Array<{ positionId: string; positionName: string; data: TrendDataPoint[] }>
   audienceProfile: AudienceProfile | null
   advertisers: Advertiser[]
   channels: Channel[]
@@ -26,9 +37,10 @@ interface DashboardState {
   setHeatmapMetric: (metric: 'roi' | 'impressions' | 'conversions') => void
   setSummary: (summary: MetricsSummary) => void
   setPreviousSummary: (summary: MetricsSummary) => void
+  setWeekOverWeek: (data: WeekOverWeek) => void
   setHeatmapData: (data: HeatmapData[]) => void
   setChannelRanking: (data: DashboardState['channelRanking']) => void
-  setPositionTrend: (data: TrendDataPoint[]) => void
+  setPositionTrend: (data: DashboardState['positionTrend']) => void
   setAudienceProfile: (data: AudienceProfile) => void
   setAdvertisers: (data: Advertiser[]) => void
   setChannels: (data: Channel[]) => void
@@ -51,6 +63,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   selectedMediaId: null,
   summary: null,
   previousSummary: null,
+  weekOverWeek: null,
   heatmapData: [],
   heatmapMetric: 'roi',
   channelRanking: [],
@@ -72,6 +85,8 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   setSummary: (summary) => set({ summary }),
 
   setPreviousSummary: (summary) => set({ previousSummary: summary }),
+
+  setWeekOverWeek: (data) => set({ weekOverWeek: data }),
 
   setHeatmapData: (data) => set({ heatmapData: data }),
 

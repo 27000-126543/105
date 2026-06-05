@@ -346,24 +346,27 @@ function initializeSeedData(db: Database.Database): void {
     const bcrypt = require('bcryptjs');
     const defaultPassword = bcrypt.hashSync('123456', 10);
     
+    const advertiserIds = ADVERTISERS.map(a => a.id);
+    const channelIds = CHANNELS.map(c => c.id);
+    
     const insertUser = db.prepare(`
-      INSERT INTO users (id, username, password_hash, name, role, email, phone)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO users (id, username, password_hash, name, role, email, phone, advertiser_ids, agency_ids, media_ids)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const defaultUsers = [
-      { id: uuidv4(), username: 'admin', name: '系统管理员', role: UserRole.ADMIN, email: 'admin@example.com', phone: '13900139000' },
-      { id: uuidv4(), username: 'optimizer', name: '优化师小王', role: UserRole.OPTIMIZER, email: 'optimizer@example.com', phone: '13900139001' },
-      { id: uuidv4(), username: 'supervisor', name: '媒介主管老李', role: UserRole.MEDIA_SUPERVISOR, email: 'supervisor@example.com', phone: '13900139002' },
-      { id: uuidv4(), username: 'director', name: '策略总监张总', role: UserRole.STRATEGY_DIRECTOR, email: 'director@example.com', phone: '13900139003' },
-      { id: uuidv4(), username: 'advertiser', name: '电商客户刘总', role: UserRole.ADVERTISER, email: 'advertiser@example.com', phone: '13900139004' },
-      { id: uuidv4(), username: 'agency', name: '代理公司小赵', role: UserRole.AGENCY, email: 'agency@example.com', phone: '13900139005' },
-      { id: uuidv4(), username: 'media', name: '媒体方老孙', role: UserRole.MEDIA, email: 'media@example.com', phone: '13900139006' }
+      { id: uuidv4(), username: 'admin', name: '系统管理员', role: UserRole.ADMIN, email: 'admin@example.com', phone: '13900139000', advertiserIds: null, agencyIds: null, mediaIds: null },
+      { id: uuidv4(), username: 'optimizer', name: '优化师小王', role: UserRole.OPTIMIZER, email: 'optimizer@example.com', phone: '13900139001', advertiserIds: null, agencyIds: null, mediaIds: null },
+      { id: uuidv4(), username: 'supervisor', name: '媒介主管老李', role: UserRole.MEDIA_SUPERVISOR, email: 'supervisor@example.com', phone: '13900139002', advertiserIds: null, agencyIds: null, mediaIds: null },
+      { id: uuidv4(), username: 'director', name: '策略总监张总', role: UserRole.STRATEGY_DIRECTOR, email: 'director@example.com', phone: '13900139003', advertiserIds: null, agencyIds: null, mediaIds: null },
+      { id: uuidv4(), username: 'advertiser', name: '电商客户刘总', role: UserRole.ADVERTISER, email: 'advertiser@example.com', phone: '13900139004', advertiserIds: JSON.stringify(advertiserIds.slice(0, 3)), agencyIds: null, mediaIds: null },
+      { id: uuidv4(), username: 'agency', name: '代理公司小赵', role: UserRole.AGENCY, email: 'agency@example.com', phone: '13900139005', advertiserIds: JSON.stringify(advertiserIds.slice(0, 4)), agencyIds: JSON.stringify(['agency_1']), mediaIds: null },
+      { id: uuidv4(), username: 'media', name: '媒体方老孙', role: UserRole.MEDIA, email: 'media@example.com', phone: '13900139006', advertiserIds: null, agencyIds: null, mediaIds: JSON.stringify(channelIds.slice(0, 3)) }
     ];
 
     const transaction = db.transaction(() => {
       for (const user of defaultUsers) {
-        insertUser.run(user.id, user.username, defaultPassword, user.name, user.role, user.email, user.phone);
+        insertUser.run(user.id, user.username, defaultPassword, user.name, user.role, user.email, user.phone, user.advertiserIds, user.agencyIds, user.mediaIds);
       }
     });
     transaction();

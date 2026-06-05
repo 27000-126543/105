@@ -7,7 +7,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@shared': path.resolve(__dirname, '../shared')
+      '@shared': path.resolve(__dirname, './src/types')
+    },
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+  },
+  esbuild: {
+    tsconfigRaw: {
+      compilerOptions: {
+        preserveConstEnums: true
+      }
     }
   },
   server: {

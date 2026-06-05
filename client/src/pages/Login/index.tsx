@@ -28,11 +28,10 @@ const Login: React.FC = () => {
   }) => {
     setLoading(true)
     try {
-      await login(values.username, values.password, values.role)
-      message.success('登录成功')
+      await login(values.username, values.password)
       navigate('/dashboard')
     } catch (error) {
-      message.error('登录失败，请重试')
+      console.error('Login error:', error)
     } finally {
       setLoading(false)
     }

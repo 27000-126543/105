@@ -56,7 +56,7 @@ const Schedules: React.FC = () => {
     setLoading(true)
     try {
       const res = await getSchedules({ status: statusFilter })
-      setSchedules(res.list)
+      setSchedules(res.schedules)
       setTotal(res.total)
     } finally {
       setLoading(false)
